@@ -1,34 +1,28 @@
+from typing import Any
 import pygame
-BLACK = (0,0,0)
+
+BLACK = (0, 0, 0)
+WHITE = (255, 255, 255)
+PADDLE_VELOCITY = 15
 
 class Paddle(pygame.sprite.Sprite):
-    #This class represents a paddle. It derives from the "Sprite" class in Pygame.
-
-    def __init__(self, color, width, height):
-        # Call the parent class (Sprite) constructor
+    def __init__(self, screen, x, y):
         super().__init__()
+        self.image = pygame.image.load("img/paddle.png")
+        self.rect = self.image.get_rect(center=(x, y))
 
-        # Pass in the color of the paddle, its width and height.
-        # Set the background color and set it to be transparent
-        self.image = pygame.Surface([width, height])
-        self.image.fill(BLACK)
-        self.image.set_colorkey(BLACK)
+        self.screen_width = screen.get_width()
+        self.velocity = PADDLE_VELOCITY # Might want to manipulate this later
 
-        # Draw the paddle (a rectangle!)
-        pygame.draw.rect(self.image, color, [0, 0, width, height])
+    def update(self) -> None:
+        keys = pygame.key.get_pressed()
 
-        # Fetch the rectangle object that has the dimensions of the image.
-        self.rect = self.image.get_rect()
+        # Handle paddle movement
+        if keys[pygame.K_LEFT] and self.rect.left > 0:
+            self.rect.x -= self.velocity
+        if keys[pygame.K_RIGHT] and self.rect.right < 800:
+            self.rect.x += self.velocity
 
-
-    def moveLeft(self, pixels):
-        self.rect.x -= pixels
-        #Check that you are not going too far (off the screen)
-        if self.rect.x < 0:
-          self.rect.x = 0
-
-    def moveRight(self, pixels):
-        self.rect.x += pixels
-        #Check that you are not going too far (off the screen)
-        if self.rect.x > 700:
-          self.rect.x = 700
+    def start(self,x=None , y=None):
+        self.rect.x = x or self.screen_width / 2
+        self.rect.y = y or self.screen_height - 50

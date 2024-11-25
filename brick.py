@@ -1,21 +1,46 @@
 import pygame
-BLACK = (0,0,0)
 
 class Brick(pygame.sprite.Sprite):
-    #This class represents a brick. It derives from the "Sprite" class in Pygame.
+    def __init__(self, x, y, width, height, color=(255, 0, 0), health=1):
+        """
+        Initialize a brick with position, size, color, and health.
 
-    def __init__(self, color, width, height):
-        # Call the parent class (Sprite) constructor
+        :param x: X-coordinate of the brick's top-left corner.
+        :param y: Y-coordinate of the brick's top-left corner.
+        :param width: Width of the brick.
+        :param height: Height of the brick.
+        :param color: Color of the brick.
+        :param health: Number of hits the brick can take before breaking.
+        """
         super().__init__()
 
-        # Pass in the color of the brick, and its x and y position, width and height.
-        # Set the background color and set it to be transparent
-        self.image = pygame.Surface([width, height])
-        self.image.fill(BLACK)
-        self.image.set_colorkey(BLACK)
+        # Create the brick surface
+        self.image = pygame.Surface((width, height))
+        self.image.fill(color)
 
-        # Draw the brick (a rectangle!)
-        pygame.draw.rect(self.image, color, [0, 0, width, height])
+        # Set the rect for positioning
+        self.rect = self.image.get_rect(topleft=(x, y))
 
-        # Fetch the rectangle object that has the dimensions of the image.
-        self.rect = self.image.get_rect()
+        # Brick attributes
+        self.color = color
+        self.health = health
+        
+
+    def hit(self):
+        """
+        Reduces the brick's health by 1 and changes its color or removes it if health is zero.
+        """
+        self.health -= 1
+        print(self.health)
+        if self.health <= 0:
+            self.kill()  # Remove the brick from all sprite groups
+        else:
+            # Darken the brick color to indicate damage
+            darker_color = tuple(max(0, c - 50) for c in self.color)  # Reduce RGB values
+            self.image.fill(darker_color)
+
+    def draw(self, screen):
+        """
+        Draw the brick on the screen.
+        """
+        screen.blit(self.image, self.rect)
